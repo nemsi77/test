@@ -1,0 +1,17 @@
+{
+  "name": "project-blue-book",
+  "version": "1.0.0",
+  "description": "Project Blue Book - UAP witness interrogation terminal with Higgsfield video reconstruction.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "@higgsfield/client": "^0.2.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

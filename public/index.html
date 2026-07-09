@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Blue Book - Dept. of Defense</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+</head>
+<body>
+    <div class="monitor-frame">
+        <div class="interference-line"></div>
+        <div class="scanlines"></div>
+        <div class="crt-overlay"></div>
+
+        <div class="monitor-screen">
+            <header>
+                <div class="logo">
+                    <h1>PROJECT BLUE BOOK</h1>
+                    <span class="classification">CLASSIFICATION: TOP SECRET // ORCON</span>
+                </div>
+                <div class="status">
+                    <span class="blinking-dot"></span> SECURE CONNECTION ESTABLISHED
+                </div>
+            </header>
+
+            <main class="dashboard">
+                <!-- Chat Section (Interrogation) -->
+                <section class="interview-panel">
+                    <div class="panel-header">
+                        <h2>A.I. INVESTIGATOR TERMINAL</h2>
+                        <span>ID: AGENT-734</span>
+                    </div>
+                    <div class="chat-history" id="chat-history">
+                        <div class="message system-msg">
+                            > INITIALIZING INVESTIGATION PROTOCOL...<br>
+                            > CONNECTING TO WITNESS TERMINAL...<br>
+                            > READY.
+                        </div>
+                    </div>
+                    <div class="input-area">
+                        <span class="prompt-arrow">></span>
+                        <textarea id="user-input" rows="1" placeholder="Describe the incident..." autofocus></textarea>
+
+                        <label for="pdf-upload" class="upload-btn" title="Upload a PDF testimony">
+                            [ LOAD PDF ]
+                        </label>
+                        <input type="file" id="pdf-upload" accept="application/pdf" style="display: none;">
+
+                        <button id="send-btn">SEND</button>
+                    </div>
+                </section>
+
+                <!-- Dossier Section (Visual Evidence) -->
+                <section class="dossier-panel" id="dossier-panel">
+                    <div class="panel-header">
+                        <h2>EVIDENCE DOSSIER</h2>
+                        <span>STATUS: PENDING DATA</span>
+                    </div>
+                    <div class="dossier-content" id="dossier-content">
+                        <div class="placeholder">
+                            <div class="loader"></div>
+                            <p>AWAITING WITNESS TESTIMONY TO GENERATE RECONSTRUCTION...</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
