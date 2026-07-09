@@ -80,7 +80,7 @@ header {
 
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-.dashboard { display: flex; flex: 1; padding: 20px; gap: 20px; height: calc(100vh - 60px); }
+.dashboard { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; }
 section { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 4px; display: flex; flex-direction: column; }
 .panel-header { padding: 10px 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; background-color: rgba(0, 255, 65, 0.05); }
 .panel-header h2 { font-size: 1rem; letter-spacing: 1px; }

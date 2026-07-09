@@ -61,6 +61,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <em>${data.higgsfield_prompt}</em>
                 </div>
 
+                <div class="actions-bar">
+                    <a href="${data.video_url}" download="reconstruction_video.mp4" target="_blank">
+                        <button class="download-btn">[ DOWNLOAD VIDEO ]</button>
+                    </a>
+                    <a href="${data.image_url}" download="evidence_frame.png" target="_blank">
+                        <button class="download-btn">[ EXPORT IMAGE ]</button>
+                    </a>
+                </div>
+
                 <div class="evidence-item">
                     <span class="evidence-label">VISUAL EVIDENCE 01 - VIDEO RECONSTRUCTION (HIGGSFIELD)</span>
                     <video src="${data.video_url}" autoplay loop muted controls></video>
@@ -69,15 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="evidence-item">
                     <span class="evidence-label">VISUAL EVIDENCE 02 - STILL FRAME</span>
                     <img src="${data.image_url}" alt="UFO Evidence">
-                </div>
-
-                <div class="actions-bar">
-                    <a href="${data.video_url}" download="reconstruction_video.mp4" target="_blank">
-                        <button class="download-btn">[ DOWNLOAD VIDEO ]</button>
-                    </a>
-                    <a href="${data.image_url}" download="evidence_frame.png" target="_blank">
-                        <button class="download-btn">[ EXPORT IMAGE ]</button>
-                    </a>
                 </div>
             </div>
         `;
