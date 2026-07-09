@@ -82,6 +82,12 @@ async function generateWithCli(model, prompt, isVideo = true) {
     cliPath = '.\\node_modules\\.bin\\higgsfield.cmd';
   }
 
+  // Ensure the correct billing workspace is set in the CLI session
+  if (process.env.HIGGSFIELD_WORKSPACE_ID) {
+    console.log(`Setting CLI workspace to: ${process.env.HIGGSFIELD_WORKSPACE_ID}`);
+    await execAsync(`${cliPath} workspace set ${process.env.HIGGSFIELD_WORKSPACE_ID}`);
+  }
+
   // Submit job
   const createCmd = `${cliPath} generate create ${model} --prompt "${prompt.replace(/"/g, '\\"')}" --aspect_ratio ${aspect} --json`;
   console.log(`Submitting CLI job: ${createCmd}`);
