@@ -63,9 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="evidence-container">
                 <div class="summary-box">
                     <strong>OFFICIAL SUMMARY:</strong><br>
-                    ${data.dossier_summary}<br><br>
-                    <span style="color:var(--text-dim)">HIGGSFIELD PROMPT:</span><br>
-                    <em>${data.higgsfield_prompt}</em>
+                    ${data.dossier_summary}
                 </div>
 
                 <div class="actions-bar">
