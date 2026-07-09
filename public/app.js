@@ -132,15 +132,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    setTimeout(async () => {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ messages: [{ role: 'user', content: "Hello, I want to report an incident." }] })
+    function startInitialChat() {
+        setTimeout(async () => {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: [{ role: 'user', content: "Hello, I want to report an incident." }], resolution: document.getElementById('resolution-select').value })
+            });
+            const data = await response.json();
+            appendMessage('agent', data.content);
+            messages.push({ role: 'user', content: "Hello, I want to report an incident." });
+            messages.push({ role: 'assistant', content: data.content });
+        }, 500);
+    }
+
+    const introScreen = document.getElementById('intro-screen');
+    const introVideo = document.getElementById('intro-video');
+
+    function hideIntro() {
+        if (!introScreen.classList.contains('intro-hidden')) {
+            introScreen.classList.add('intro-hidden');
+            setTimeout(() => introScreen.style.display = 'none', 1000);
+            startInitialChat();
+        }
+    }
+
+    if (introVideo) {
+        introVideo.addEventListener('ended', hideIntro);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !introScreen.classList.contains('intro-hidden')) {
+                hideIntro();
+            }
         });
-        const data = await response.json();
-        appendMessage('agent', data.content);
-        messages.push({ role: 'user', content: "Hello, I want to report an incident." });
-        messages.push({ role: 'assistant', content: data.content });
-    }, 1500);
+        introScreen.addEventListener('click', hideIntro);
+    } else {
+        startInitialChat();
+    }
 });
