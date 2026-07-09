@@ -70,7 +70,9 @@ async function generateWithCli(model, prompt, isVideo = true) {
   const aspect = isVideo ? '16:9' : '1:1';
   
   // Inject credentials dynamically for non-interactive CLI environments like Render
-  if (process.env.HIGGSFIELD_API_KEY && process.env.HIGGSFIELD_API_SECRET) {
+  if (process.env.HIGGSFIELD_API_TOKEN) {
+    process.env.HF_TOKEN = process.env.HIGGSFIELD_API_TOKEN;
+  } else if (process.env.HIGGSFIELD_API_KEY && process.env.HIGGSFIELD_API_SECRET) {
     process.env.HF_CREDENTIALS = `${process.env.HIGGSFIELD_API_KEY}:${process.env.HIGGSFIELD_API_SECRET}`;
   }
 
