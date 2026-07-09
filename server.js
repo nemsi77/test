@@ -182,6 +182,7 @@ app.post('/api/chat', async (req, res) => {
       let hasWeather = false;
       let hasShape = false;
       let hasMovement = false;
+      let hasDate = false;
       
       const userMessages = messages.filter(m => m.role === 'user');
       userMessages.forEach(m => {
@@ -205,15 +206,19 @@ app.post('/api/chat', async (req, res) => {
           if (text.includes("speed") || text.includes("fast") || text.includes("rapid")) { movement = "shooting across the clouds at hyper-velocity"; hasMovement = true; }
           if (text.includes("zig") || text.includes("zag") || text.includes("erratic")) { movement = "moving in sharp erratic zig-zag patterns"; hasMovement = true; }
           if (text.includes("land") || text.includes("ground")) { movement = "slowly descending to touch the ground"; hasMovement = true; }
+          
+          if (text.match(/\b(19\d{2}|20\d{2})\b/)) { hasDate = true; }
       });
       
       const questionCount = userMessages.length;
-      const isComplete = (hasLocation && hasWeather && hasShape) || questionCount >= 5;
+      const isComplete = (hasLocation && hasWeather && hasShape && hasDate) || questionCount >= 6;
 
       if (!isComplete) {
           let followUp = "I see. Please tell me more about the incident.";
           if (questionCount === 1) {
               followUp = "Agent BlueBook connected. Please describe the incident. Where exactly were you?";
+          } else if (!hasDate) {
+              followUp = "This is a critical detail: could you specify the exact year this incident took place for our archives?";
           } else if (!hasLocation) {
               followUp = "Understood. Where did this sighting take place? What was the surrounding environment?";
           } else if (!hasWeather) {
