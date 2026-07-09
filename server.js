@@ -244,10 +244,12 @@ app.post('/api/chat', async (req, res) => {
         }
       }
 
+      const combinedUserText = userMessages.map(m => m.content).join(' ');
+
       parsedCompletion = {
           status: 'complete',
-          higgsfield_prompt: `Amateur eye-witness capture, ${stylePrompt}, over a ${location}, a ${shape} ${movement}, 4k resolution, photorealistic reconstruction`,
-          dossier_summary: `The witness reports observing a ${shape} over a ${location} during a ${weather} (Dated era: ${year}).`
+          higgsfield_prompt: `Amateur eye-witness capture, ${stylePrompt}, over a ${location}, a ${shape} ${movement}, depicting: ${combinedUserText}. 4k resolution, photorealistic reconstruction, cinematic lighting`,
+          dossier_summary: `The witness reports observing a ${shape} over a ${location} during a ${weather} (Dated era: ${year}). Detailed account: "${combinedUserText.substring(0, 150)}..."`
       };
     }
 
