@@ -260,7 +260,10 @@ app.post('/api/chat', async (req, res) => {
         }
       }
 
-      const combinedUserText = userMessages.map(m => m.content).join(' ');
+      const combinedUserText = userMessages
+        .filter(m => !m.content.includes("Hello, I want to report an incident"))
+        .map(m => m.content)
+        .join(' ');
 
       parsedCompletion = {
           status: 'complete',

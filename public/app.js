@@ -6,10 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let messages = [];
     let currentSketchBase64 = null;
 
-    function appendMessage(role, content) {
+    function appendMessage(role, content, isHtml = false) {
         const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${role === 'user' ? 'user-msg' : 'agent-msg'}`;
-        msgDiv.textContent = content;
+        msgDiv.className = `message ${role}-msg`;
+        if (isHtml) {
+            msgDiv.innerHTML = `${role === 'user' ? 'WITNESS' : 'AGENT'}:<br><br>${content}`;
+        } else {
+            msgDiv.textContent = `${role === 'user' ? 'WITNESS' : 'AGENT'}: ${content}`;
+        }
         chatHistory.appendChild(msgDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
@@ -39,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 appendMessage('agent', data.content);
                 messages.push({ role: 'assistant', content: data.content });
             } else if (data.type === 'complete') {
-                appendMessage('agent', `> SATELLITE LINK ESTABLISHED...<br>> CROSS-REFERENCING RADAR ANOMALIES...<br>> 2 UNREGISTERED FLIGHTS DETECTED.<br><div class="osint-radar-container"><div class="radar"></div><div class="osint-text">TARGET ACQUIRED<br>LAT: 49°51'21"N LON: 5°09'34"E<br>CORROBORATING EVIDENCE...</div></div>`);
+                appendMessage('agent', `> SATELLITE LINK ESTABLISHED...<br>> CROSS-REFERENCING RADAR ANOMALIES...<br>> 2 UNREGISTERED FLIGHTS DETECTED.<br><div class="osint-radar-container"><div class="radar"></div><div class="osint-text">TARGET ACQUIRED<br>LAT: 49°51'21"N LON: 5°09'34"E<br>CORROBORATING EVIDENCE...</div></div>`, true);
                 showEvidence(data);
                 messages = []; // Reset for new session
                 currentSketchBase64 = null;
