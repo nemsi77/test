@@ -134,6 +134,26 @@ video, img { width: 100%; height: auto; border: 1px solid #333; }
     object-fit: cover;
     opacity: 0.85;
 }
+.intro-tagline {
+    position: absolute;
+    top: 65%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+    opacity: 0;
+    animation: fade-in-out 4s forwards;
+    animation-delay: 1s;
+}
+@keyframes fade-in-out {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
 .intro-skip {
     position: absolute;
     bottom: 30px;
