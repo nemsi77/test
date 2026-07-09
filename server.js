@@ -69,19 +69,39 @@ async function runCliCommand(command) {
 async function generateWithCli(model, prompt, isVideo = true) {
   const aspect = isVideo ? '16:9' : '1:1';
   
-  // Inject credentials dynamically for non-interactive CLI environments like Render
-  if (process.env.HIGGSFIELD_API_TOKEN) {
-    process.env.HF_TOKEN = process.env.HIGGSFIELD_API_TOKEN;
-  } else if (process.env.HIGGSFIELD_API_KEY && process.env.HIGGSFIELD_API_SECRET) {
-    process.env.HF_CREDENTIALS = `${process.env.HIGGSFIELD_API_KEY}:${process.env.HIGGSFIELD_API_SECRET}`;
-  }
-
   // Resolve CLI binary path (local node_modules/.bin on Render / Windows, fallback to global)
   let cliPath = 'higgsfield';
   if (fs.existsSync('./node_modules/.bin/higgsfield')) {
     cliPath = './node_modules/.bin/higgsfield';
   } else if (fs.existsSync('.\\node_modules\\.bin\\higgsfield.cmd')) {
     cliPath = '.\\node_modules\\.bin\\higgsfield.cmd';
+  }
+
+  // Dynamically write credentials.json to ~/.config/higgsfield/credentials.json on Render to bypass OAuth browser login
+  if (process.env.HIGGSFIELD_API_TOKEN) {
+    const homeDir = process.env.HOME || process.env.USERPROFILE || '/opt/render';
+    const configDir = path.join(homeDir, '.config', 'higgsfield');
+    const credsPath = path.join(configDir, 'credentials.json');
+    
+    try {
+      if (!fs.existsSync(configDir)) {
+        fs.mkdirSync(configDir, { recursive: true });
+      }
+      
+      const credsData = {
+        auth_version: 2,
+        access_token: process.env.HIGGSFIELD_API_TOKEN,
+        refresh_token: "ZTCYNJI1ZWUTNZZMZS01ZME5LWE4ZDGTYTK0ODHHYMI1ZGVI",
+        expires_at: 1999999999, // Far future expiry
+        token_type: "bearer",
+        scope: "profile offline_access user:org:read email"
+      };
+      
+      fs.writeFileSync(credsPath, JSON.stringify(credsData, null, 2), 'utf8');
+      console.log(`Successfully wrote CLI credentials to: ${credsPath}`);
+    } catch (err) {
+      console.warn('Failed to write credentials.json file:', err.message);
+    }
   }
 
   // Ensure the correct billing workspace is set in the CLI session
