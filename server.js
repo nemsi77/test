@@ -228,16 +228,14 @@ app.post('/api/chat', async (req, res) => {
           let followUp = "I see. Please tell me more about the incident.";
           if (questionCount === 1) {
               followUp = "Agent BlueBook connected. Please describe the incident. Where exactly were you?";
-          } else if (!hasDate) {
-              followUp = "This is a critical detail: could you specify the exact year this incident took place for our archives?";
-          } else if (!hasLocation) {
-              followUp = "Understood. Where did this sighting take place? What was the surrounding environment?";
-          } else if (!hasWeather) {
-              followUp = "I see. What were the weather and lighting conditions at that time?";
-          } else if (!hasShape) {
+          } else if (questionCount === 2) {
+              followUp = "Understood. What were the weather and lighting conditions at that time?";
+          } else if (questionCount === 3) {
               followUp = "Environment noted. Can you describe the precise shape and appearance of the anomaly?";
-          } else if (!hasMovement) {
+          } else if (questionCount === 4) {
               followUp = "Interesting. How was the object moving? Was there any sound?";
+          } else if (questionCount === 5) {
+              followUp = "This is a critical detail: could you specify the exact year this incident took place for our archives?";
           }
           return res.json({ type: 'message', content: followUp });
       }

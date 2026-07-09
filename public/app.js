@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${role}-msg`;
         if (isHtml) {
-            msgDiv.innerHTML = `${role === 'user' ? 'WITNESS' : 'AGENT'}:<br><br>${content}`;
+            msgDiv.innerHTML = content;
         } else {
-            msgDiv.textContent = `${role === 'user' ? 'WITNESS' : 'AGENT'}: ${content}`;
+            msgDiv.textContent = content;
         }
         chatHistory.appendChild(msgDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
