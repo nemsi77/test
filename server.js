@@ -176,10 +176,28 @@ app.post('/api/chat', async (req, res) => {
           return res.json({ type: 'message', content: followUp });
       }
 
+      // Dynamic styling depending on historical era detected
+      let year = 1990;
+      let stylePrompt = "grainy 1990s VHS amateur camcorder footage, tracking artifacts, color bleed, low resolution, shaky hand-held recording, night-vision tint";
+      
+      const yearMatch = messages.map(m => m.content).join(" ").match(/\b(19\d{2}|20\d{2})\b/);
+      if (yearMatch) {
+        year = parseInt(yearMatch[0], 10);
+        if (year < 1980) {
+          stylePrompt = "authentic 1970s 8mm film archive, warm vintage colors, scratch marks, heavy film grain, light leaks, projector shutter flicker, amateur home movie";
+        } else if (year >= 1980 && year < 2000) {
+          stylePrompt = `authentic ${year} VHS home video camcorder recording, tracking glitches, color bleeding, vhs scanlines, grainy night vision, shaky cam, timestamp ${year}`;
+        } else if (year >= 2000 && year < 2015) {
+          stylePrompt = "early 2000s low-res digital camera recording, pixelated digital compression noise, mobile phone video style, auto-focus breathing, shaky hands";
+        } else {
+          stylePrompt = "modern smartphone night mode video, vertical phone recording style, auto-exposure adjustments, high-ISO sensor noise, authentic accidental capture";
+        }
+      }
+
       parsedCompletion = {
           status: 'complete',
-          higgsfield_prompt: `Cinematic night shot, ${weather}, over a ${location}, a ${shape} ${movement}, searchlight beams, 8k, photorealistic, vhs glitch style`,
-          dossier_summary: `The witness reports observing a ${shape} over a ${location} during a ${weather}.`
+          higgsfield_prompt: `Amateur eye-witness capture, ${stylePrompt}, over a ${location}, a ${shape} ${movement}, 4k resolution, photorealistic reconstruction`,
+          dossier_summary: `The witness reports observing a ${shape} over a ${location} during a ${weather} (Dated era: ${year}).`
       };
     }
 
