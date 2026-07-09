@@ -6,6 +6,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { HiggsfieldClient } from '@higgsfield/client';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import fs from 'fs';
 
 const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -68,8 +69,21 @@ async function runCliCommand(command) {
 async function generateWithCli(model, prompt, isVideo = true) {
   const aspect = isVideo ? '16:9' : '1:1';
   
+  // Inject credentials dynamically for non-interactive CLI environments like Render
+  if (process.env.HIGGSFIELD_API_KEY && process.env.HIGGSFIELD_API_SECRET) {
+    process.env.HF_CREDENTIALS = `${process.env.HIGGSFIELD_API_KEY}:${process.env.HIGGSFIELD_API_SECRET}`;
+  }
+
+  // Resolve CLI binary path (local node_modules/.bin on Render / Windows, fallback to global)
+  let cliPath = 'higgsfield';
+  if (fs.existsSync('./node_modules/.bin/higgsfield')) {
+    cliPath = './node_modules/.bin/higgsfield';
+  } else if (fs.existsSync('.\\node_modules\\.bin\\higgsfield.cmd')) {
+    cliPath = '.\\node_modules\\.bin\\higgsfield.cmd';
+  }
+
   // Submit job
-  const createCmd = `higgsfield generate create ${model} --prompt "${prompt.replace(/"/g, '\\"')}" --aspect_ratio ${aspect} --json`;
+  const createCmd = `${cliPath} generate create ${model} --prompt "${prompt.replace(/"/g, '\\"')}" --aspect_ratio ${aspect} --json`;
   console.log(`Submitting CLI job: ${createCmd}`);
   const [jobId] = await runCliCommand(createCmd);
   console.log(`CLI job submitted successfully. Job ID: ${jobId}`);
@@ -80,7 +94,7 @@ async function generateWithCli(model, prompt, isVideo = true) {
   
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(resolve => setTimeout(resolve, delay));
-    const statusCmd = `higgsfield generate get ${jobId} --json`;
+    const statusCmd = `${cliPath} generate get ${jobId} --json`;
     const job = await runCliCommand(statusCmd);
     
     console.log(`Polling CLI job ${jobId}: status is ${job.status}`);
