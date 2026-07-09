@@ -1,99 +1,38 @@
-# PROJECT BLUE BOOK
+# 🛸 Project Blue Book: UAP Testimony Transcription Engine
 
-A classified-terminal-styled UAP witness intake app. The frontend is a retro
-CRT interrogation console; the backend runs an AI investigator ("BlueBook")
-that extracts four details from the witness (location, weather, shape,
-movement) and then generates a video + still-frame reconstruction with
-Higgsfield.
+**Project Blue Book** is an immersive, 1980s retro-terminal web application designed for the official transcription of Unidentified Anomalous Phenomena (UAP) testimonies. 
+Built for referencing agencies like GEIPAN and AARO, this tool takes witness accounts and hand-drawn sketches, and transforms them into highly precise, photorealistic video evidence using the **Higgsfield AI** engine.
 
-## Stack
+## ✨ Features
 
-- **Frontend** — plain HTML/CSS/JS (`public/`), no build step. PDF testimony
-  parsing runs client-side with `pdf.js`.
-- **Backend** — Node + Express (`server.js`), exposing a single `POST
-  /api/chat` endpoint.
-- **Interrogation agent** — Claude (Anthropic API), driven by the exact
-  BlueBook system prompt from the brief. It replies with plain text while
-  gathering details, then with a JSON completion block once it has all four.
-- **Reconstruction** — the official [`@higgsfield/client`](https://github.com/higgsfield-ai/higgsfield-js)
-  Node SDK, called server-side once the interrogation JSON is received.
+- **📺 Immersive Retro UI:** A fully responsive, full-screen CRT monitor experience complete with scanlines, phosphor glow, flicker effects, and a cinematic video boot-up sequence.
+- **🕵️‍♂️ Interactive AI Agent:** An automated interrogation protocol that dynamically extracts missing key details (Year, Location, Weather, Shape, Movement) from the witness.
+- **📡 OSINT Radar Integration:** Real-time visual feedback with a simulated satellite radar sweep and anomaly cross-referencing directly in the chat interface.
+- **🖼️ Sketch-to-Video:** Users can upload their own sketches or photos as visual references. The app utilizes Higgsfield's Image-to-Video capabilities to perfectly reconstruct the anomaly's shape.
+- **📄 Evidence Export:** Download the generated video and high-resolution still frames directly from the dossier.
 
-## Why this isn't built on Higgsfield's own app platform
+## 🚀 How it uses Higgsfield AI
 
-Higgsfield's hosted app builder requires Sign-in-with-Higgsfield auth and its
-Quanta design system for anything that does AI generation — it doesn't
-support a fully custom skin or a bespoke chat backend. Since you wanted the
-exact CRT design and interrogation flow as specified, this is a standalone
-app you host yourself, calling Higgsfield's public API directly instead of
-going through their app platform.
+This project heavily leverages the **Higgsfield CLI** to process multimodal inputs:
+- **Text-to-Video:** The witness testimony is compiled into a highly detailed prompt targeting authentic VHS or 35mm film aesthetics, and sent to the `seedance_2_0` model.
+- **Image-to-Video:** When a witness uploads a sketch, the backend passes the file via the `--image-references` flag to ensure the generated craft strictly adheres to the witness's memory.
 
-## Setup
+## 🛠️ Tech Stack
+- **Frontend:** Vanilla HTML, CSS, JavaScript (Custom CSS for retro CRT rendering).
+- **Backend:** Node.js, Express.
+- **AI Engine:** Higgsfield CLI (`seedance_2_0` & `photon_1`).
+
+## 📥 Installation & Local Dev
 
 ```bash
+# Clone the repository
+git clone https://github.com/nemsi77/test.git
+cd test
+
+# Install dependencies
 npm install
-cp .env.example .env
-# fill in ANTHROPIC_API_KEY, HIGGSFIELD_API_KEY, HIGGSFIELD_API_SECRET
+
+# Run the server
 npm start
 ```
-
-Then open `http://localhost:3000`.
-
-- Anthropic key: https://console.anthropic.com
-- Higgsfield API key/secret: create an account and generate credentials at
-  https://cloud.higgsfield.ai
-
-## How the flow works
-
-1. On load, the frontend sends a greeting to `/api/chat`; BlueBook opens the
-   interrogation.
-2. Each witness message is appended to the running `messages` array and sent
-   to `/api/chat`, which forwards it to Claude with the BlueBook system
-   prompt.
-3. While Claude is still gathering details, `/api/chat` returns
-   `{ type: "message", content: "..." }` and the reply is shown in the chat.
-4. Once Claude has all four details, it replies with **only** the JSON
-   completion block:
-   ```json
-   {
-     "status": "complete",
-     "higgsfield_prompt": "Cinematic shot, ...",
-     "dossier_summary": "..."
-   }
-   ```
-   `server.js` detects this, calls `higgsfield.generate(...)` twice (once for
-   video, once for a still image) using `higgsfield_prompt`, and returns
-   ```json
-   {
-     "type": "complete",
-     "higgsfield_prompt": "...",
-     "dossier_summary": "...",
-     "video_url": "https://...",
-     "image_url": "https://..."
-   }
-   ```
-5. The frontend renders both in the EVIDENCE DOSSIER panel with download
-   buttons.
-
-## Notes / things to check before the hackathon demo
-
-- **Higgsfield model IDs**: `server.js` calls `/v1/text2video/higgsfield_v1`
-  and `/v1/text2image/soul` as placeholders for the video and image models —
-  confirm the exact endpoint paths and required parameters (aspect ratio,
-  duration, etc.) against your Higgsfield dashboard/docs once you have
-  credentials, since exact model slugs can change.
-- **Latency**: video generation can take well over a minute. For the demo,
-  consider showing a "reconstruction in progress" state in the dossier panel
-  (the frontend's `.loader` element) rather than blocking silently — you may
-  want to switch `/api/chat` to kick off generation asynchronously and poll
-  from the frontend if judges are watching live.
-- **Error states**: if Higgsfield generation fails, `/api/chat` currently
-  returns a 500 with a generic message — you may want a friendlier
-  "reconstruction failed, try re-describing the object" path for the demo.
-- **Secrets**: never commit `.env`; only `.env.example` is checked in.
-
-## Deploying
-
-Any Node host works (Render, Fly.io, Railway, a VPS, etc.). Set the three
-environment variables in your host's dashboard, `npm install && npm start`.
-Make sure the process serves on the port your host expects (`PORT` env var
-is respected).
+*The server will be available at `http://localhost:10000`.*
