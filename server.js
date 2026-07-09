@@ -66,7 +66,7 @@ async function runCliCommand(command) {
   return JSON.parse(stdout.trim());
 }
 
-async function generateWithCli(model, prompt, isVideo = true, resolution = '720p') {
+async function generateWithCli(model, prompt, isVideo = true, resolution = '720p', sketchPath = null) {
   const aspect = isVideo ? '16:9' : '1:1';
   let extraArgs = '';
   
@@ -119,7 +119,11 @@ async function generateWithCli(model, prompt, isVideo = true, resolution = '720p
   }
 
   // Submit job
-  const createCmd = `${cliPath} generate create ${model} --prompt "${prompt.replace(/"/g, '\\"')}" --aspect_ratio ${aspect}${extraArgs} --json`;
+  let createCmd = `${cliPath} generate create ${model} --prompt "${prompt.replace(/"/g, '\\"')}" --aspect_ratio ${aspect}${extraArgs} --json`;
+  if (sketchPath) {
+    createCmd += ` --image-references "${sketchPath}"`;
+  }
+  
   console.log(`Submitting CLI job: ${createCmd}`);
   const [jobId] = await runCliCommand(createCmd);
   console.log(`CLI job submitted successfully. Job ID: ${jobId}`);
@@ -147,7 +151,14 @@ async function generateWithCli(model, prompt, isVideo = true, resolution = '720p
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { messages, resolution } = req.body;
+    const { messages, resolution, sketch } = req.body;
+    
+    let sketchPath = null;
+    if (sketch) {
+        const base64Data = sketch.replace(/^data:image\/\w+;base64,/, "");
+        sketchPath = path.join(__dirname, `sketch_${Date.now()}.png`);
+        fs.writeFileSync(sketchPath, base64Data, 'base64');
+    }
     if (!Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: 'messages array is required' });
     }
@@ -271,12 +282,17 @@ app.post('/api/chat', async (req, res) => {
     const selectedResolution = resolution || '720p';
 
     console.log(`Triggering video generation via CLI with model: ${videoModel} at ${selectedResolution}...`);
-    const videoUrl = await generateWithCli(videoModel, higgsfield_prompt, true, selectedResolution);
+    const videoUrl = await generateWithCli(videoModel, higgsfield_prompt, true, selectedResolution, sketchPath);
     console.log('Video generated successfully:', videoUrl);
 
     console.log(`Triggering image generation via CLI with model: ${imageModel}...`);
-    const imageUrl = await generateWithCli(imageModel, higgsfield_prompt, false);
+    const imageUrl = await generateWithCli(imageModel, higgsfield_prompt, false, '720p', sketchPath);
     console.log('Image generated successfully:', imageUrl);
+
+    // clean up sketch if needed
+    if (sketchPath && fs.existsSync(sketchPath)) {
+        fs.unlinkSync(sketchPath);
+    }
 
     return res.json({
       type: 'complete',

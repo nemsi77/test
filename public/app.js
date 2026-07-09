@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('send-btn');
     const dossierContent = document.getElementById('dossier-content');
     let messages = [];
+    let currentSketchBase64 = null;
 
     function appendMessage(role, content) {
         const msgDiv = document.createElement('div');
@@ -30,16 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages, resolution })
+                body: JSON.stringify({ messages, resolution, sketch: currentSketchBase64 })
             });
             const data = await response.json();
 
-            if (data.type === 'complete') {
-                appendMessage('agent', "DATA ACQUIRED. RECONSTRUCTION IN PROGRESS...");
-                showEvidence(data);
-            } else {
+            if (data.type === 'message') {
                 appendMessage('agent', data.content);
                 messages.push({ role: 'assistant', content: data.content });
+            } else if (data.type === 'complete') {
+                appendMessage('agent', `> SATELLITE LINK ESTABLISHED...<br>> CROSS-REFERENCING RADAR ANOMALIES...<br>> 2 UNREGISTERED FLIGHTS DETECTED.<br><div class="osint-radar-container"><div class="radar"></div><div class="osint-text">TARGET ACQUIRED<br>LAT: 49°51'21"N LON: 5°09'34"E<br>CORROBORATING EVIDENCE...</div></div>`);
+                showEvidence(data);
+                messages = []; // Reset for new session
+                currentSketchBase64 = null;
             }
         } catch (error) {
             console.error(error);
@@ -132,12 +135,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const sketchUpload = document.getElementById('sketch-upload');
+    sketchUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file || !file.type.startsWith('image/')) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            currentSketchBase64 = event.target.result;
+            appendMessage('system', '> VISUAL REFERENCE ACQUIRED (SKETCH LOADED).');
+        };
+        reader.readAsDataURL(file);
+    });
+
     function startInitialChat() {
         setTimeout(async () => {
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: [{ role: 'user', content: "Hello, I want to report an incident." }], resolution: document.getElementById('resolution-select').value })
+                body: JSON.stringify({ messages: [{ role: 'user', content: "Hello, I want to report an incident." }], resolution: document.getElementById('resolution-select').value, sketch: currentSketchBase64 })
             });
             const data = await response.json();
             appendMessage('agent', data.content);
