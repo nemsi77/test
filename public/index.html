@@ -48,6 +48,13 @@
                         </label>
                         <input type="file" id="pdf-upload" accept="application/pdf" style="display: none;">
 
+                        <select id="resolution-select" class="upload-btn" style="background:transparent; border:1px solid var(--accent-blue); color:var(--accent-blue); padding:5px; font-family: 'Share Tech Mono', monospace; cursor:pointer;">
+                            <option value="480p" style="background:var(--bg-black)">480p (Fast)</option>
+                            <option value="720p" selected style="background:var(--bg-black)">720p (Fast)</option>
+                            <option value="1080p" style="background:var(--bg-black)">1080p (Standard)</option>
+                            <option value="4k" style="background:var(--bg-black)">4K (Standard)</option>
+                        </select>
+
                         <button id="send-btn">SEND</button>
                     </div>
                 </section>

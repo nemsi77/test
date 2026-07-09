@@ -66,9 +66,17 @@ async function runCliCommand(command) {
   return JSON.parse(stdout.trim());
 }
 
-async function generateWithCli(model, prompt, isVideo = true) {
+async function generateWithCli(model, prompt, isVideo = true, resolution = '720p') {
   const aspect = isVideo ? '16:9' : '1:1';
+  let extraArgs = '';
   
+  if (isVideo) {
+    extraArgs += ` --resolution ${resolution}`;
+    if (resolution === '480p' || resolution === '720p') {
+      extraArgs += ' --mode fast';
+    }
+  }
+
   // Resolve CLI binary path (local node_modules/.bin on Render / Windows, fallback to global)
   let cliPath = 'higgsfield';
   if (fs.existsSync('./node_modules/.bin/higgsfield')) {
@@ -111,7 +119,7 @@ async function generateWithCli(model, prompt, isVideo = true) {
   }
 
   // Submit job
-  const createCmd = `${cliPath} generate create ${model} --prompt "${prompt.replace(/"/g, '\\"')}" --aspect_ratio ${aspect} --json`;
+  const createCmd = `${cliPath} generate create ${model} --prompt "${prompt.replace(/"/g, '\\"')}" --aspect_ratio ${aspect}${extraArgs} --json`;
   console.log(`Submitting CLI job: ${createCmd}`);
   const [jobId] = await runCliCommand(createCmd);
   console.log(`CLI job submitted successfully. Job ID: ${jobId}`);
@@ -139,7 +147,7 @@ async function generateWithCli(model, prompt, isVideo = true) {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { messages } = req.body;
+    const { messages, resolution } = req.body;
     if (!Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: 'messages array is required' });
     }
@@ -253,9 +261,10 @@ app.post('/api/chat', async (req, res) => {
 
     const videoModel = process.env.HIGGSFIELD_VIDEO_MODEL || 'seedance_2_0';
     const imageModel = process.env.HIGGSFIELD_IMAGE_MODEL || 'flux_2';
+    const selectedResolution = resolution || '720p';
 
-    console.log(`Triggering video generation via CLI with model: ${videoModel}...`);
-    const videoUrl = await generateWithCli(videoModel, higgsfield_prompt, true);
+    console.log(`Triggering video generation via CLI with model: ${videoModel} at ${selectedResolution}...`);
+    const videoUrl = await generateWithCli(videoModel, higgsfield_prompt, true, selectedResolution);
     console.log('Video generated successfully:', videoUrl);
 
     console.log(`Triggering image generation via CLI with model: ${imageModel}...`);

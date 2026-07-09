@@ -24,11 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         messages.push({ role: 'user', content: text });
 
+        const resolution = document.getElementById('resolution-select').value;
+
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages })
+                body: JSON.stringify({ messages, resolution })
             });
             const data = await response.json();
 
